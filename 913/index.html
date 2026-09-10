@@ -926,7 +926,7 @@
 
     // 格式化學生學習單檔名 (例如 "03" -> ./worksheet/906_03.jpg)
     function getStudentUrl(seat) {
-      return `./worksheet/906__${seat}.jpg`;
+      return `./worksheet/913__${seat}.jpg`;
     }
 
     // 抽熱門關鍵字
@@ -995,7 +995,7 @@
 
     function openStudentModal(seat, name) {
       currentTextbookPage = null; // 非課本，關閉翻頁功能
-      document.getElementById('modal-title').innerText = `906班 ${seat}號 ${name} 學生學習單原檔`;
+      document.getElementById('modal-title').innerText = `913班 ${seat}號 ${name} 學生學習單原檔`;
       document.getElementById('modal-img').src = getStudentUrl(seat);
       
       // 隱藏課本翻頁按鈕
