@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>915班 課堂關鍵字探索與抽籤系統</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0d111e 0%, #161b2e 100%);
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 20px;
+    }
+
+    /* 頂部標題區域 */
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, #ff416c, #ff4b2b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      color: #9aa0b4;
+      font-size: 1rem;
+    }
+
+    /* 主要雙欄卡片容器 */
+    .main-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      width: 100%;
+      max-width: 1100px;
+    }
+
+    @media (max-width: 768px) {
+      .main-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* 卡片通用樣式 */
+    .card {
+      background: rgba(22, 27, 46, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hot-title { color: #ffffff; }
+    .cold-title { color: #ffffff; }
+
+    /* 展示內容的虛線內框 */
+    .display-box {
+      background: #111524;
+      border: 1px dashed #2b334d;
+      border-radius: 14px;
+      min-height: 220px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .placeholder-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #00b4d8;
+      margin-bottom: 8px;
+    }
+
+    .hot-box .placeholder-title {
+      color: #ffffff;
+    }
+
+    .placeholder-sub {
+      color: #6c757d;
+      font-size: 0.95rem;
+    }
+
+    /* 關鍵字結果樣式 */
+    .keyword-text {
+      font-size: 2.2rem;
+      font-weight: 900;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+
+    .hot-text { color: #ffffff; }
+    .cold-text { color: #38bdf8; }
+
+    /* 標籤與細節 */
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .badge-rank {
+      background: #f59e0b;
+      color: #000;
+    }
+
+    .sub-info {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+    }
+
+    /* 按鈕組 */
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 8px;
+    }
+
+    .action-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .action-btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn-textbook {
+      background: #0284c7;
+      color: #ffffff;
+    }
+
+    .btn-textbook:hover {
+      background: #0369a1;
+    }
+
+    .btn-student {
+      background: #334155;
+      color: #38bdf8;
+      border: 1px solid #0284c7;
+    }
+
+    .btn-student:hover {
+      background: #1e293b;
+    }
+
+    /* 抽籤大按鈕 */
+    .draw-btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 12px;
+      border: none;
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #ffffff;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .draw-btn:active {
+      transform: scale(0.98);
+    }
+
+    .draw-hot {
+      background: #ff3b5c;
+    }
+
+    .draw-hot:hover {
+      background: #e62e4d;
+    }
+
+    .draw-cold {
+      background: #00b4d8;
+    }
+
+    .draw-cold:hover {
+      background: #0096c7;
+    }
+
+    .counter {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 0.85rem;
+      color: #64748b;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 4px 12px;
+      border-radius: 20px;
+      align-self: center;
+    }
+
+    /* ---------------- 方案 B: 滿版圖片 Modal 彈窗 ---------------- */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(10, 13, 22, 0.92);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 15px;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-header {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0 15px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 15px;
+    }
+
+    .modal-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .modal-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .nav-btn {
+      background: #1e293b;
+      color: #38bdf8;
+      border: 1px solid #334155;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .close-btn {
+      background: #ef4444;
+      color: #ffffff;
+      border: none;
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .modal-body {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .modal-img {
+      width: 100%;
+      height: auto;
+      max-height: 85vh;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>915班 課堂關鍵字探索與抽籤系統</h1>
+    <p>依照 915 班學習單整理的藝術關鍵字抽選</p>
+  </div>
+
+  <div class="main-container">
+    <!-- 左側：熱門關鍵字 -->
+    <div class="card">
+      <div class="card-title hot-title">🔥 熱門關鍵字</div>
+      <div class="display-box hot-box" id="hot-box">
+        <div class="placeholder-title">點擊下方按鈕開始</div>
+        <div class="placeholder-sub">準備進行熱門抽籤</div>
+      </div>
+      <button class="draw-btn draw-hot" onclick="drawHot()">抽取熱門關鍵字</button>
+      <div class="counter" id="hot-counter">剩餘可抽：30 / 30</div>
+    </div>
+
+    <!-- 右側：冷門關鍵字 -->
+    <div class="card">
+      <div class="card-title cold-title">❄️ 獨家冷門關鍵字</div>
+      <div class="display-box cold-box" id="cold-box">
+        <div class="placeholder-title">點擊下方按鈕開始</div>
+        <div class="placeholder-sub">準備進行冷門抽籤</div>
+      </div>
+      <button class="draw-btn draw-cold" onclick="drawCold()">抽取冷門關鍵字</button>
+      <div class="counter" id="cold-counter">剩餘可抽：29 / 29</div>
+    </div>
+  </div>
+
+  <!-- 滿版 Modal 彈窗 -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">課本頁面預覽</div>
+      <div class="modal-controls">
+        <button class="nav-btn" id="btn-prev-page" onclick="changeTextbookPage(-1)">⬅️ 上一頁</button>
+        <button class="nav-btn" id="btn-next-page" onclick="changeTextbookPage(1)">下一頁 ➡️</button>
+        <button class="close-btn" onclick="closeModal()">❌ 關閉</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <img src="" id="modal-img" class="modal-img" alt="預覽圖片">
+    </div>
+  </div>
+
+  <script>
+    // 915 班資料集 (來自 915name_已補入熱門關鍵字課本頁碼.xlsx)
+    const hotData = [
+  {
+    "rank": 1,
+    "keyword": "黃土水",
+    "count": "14 次",
+    "page": 94
+  },
+  {
+    "rank": 2,
+    "keyword": "聖殤",
+    "count": "11 次",
+    "page": 99
+  },
+  {
+    "rank": 3,
+    "keyword": "梵谷",
+    "count": "11 次",
+    "page": 119
+  },
+  {
+    "rank": 4,
+    "keyword": "黑寡婦",
+    "count": "10 次",
+    "page": 109
+  },
+  {
+    "rank": 5,
+    "keyword": "基督像",
+    "count": "10 次",
+    "page": 99
+  },
+  {
+    "rank": 6,
+    "keyword": "兔子",
+    "count": "10 次",
+    "page": 106
+  },
+  {
+    "rank": 7,
+    "keyword": "長期停車",
+    "count": "9 次",
+    "page": 107
+  },
+  {
+    "rank": 8,
+    "keyword": "陳老太太像",
+    "count": "9 次",
+    "page": 95
+  },
+  {
+    "rank": 9,
+    "keyword": "哆啦A夢",
+    "count": "8 次",
+    "page": 12
+  },
+  {
+    "rank": 10,
+    "keyword": "噴泉",
+    "count": "8 次",
+    "page": 108
+  },
+  {
+    "rank": 11,
+    "keyword": "夥伴",
+    "count": "8 次",
+    "page": 101
+  },
+  {
+    "rank": 12,
+    "keyword": "我與死神",
+    "count": "7 次",
+    "page": 117
+  },
+  {
+    "rank": 13,
+    "keyword": "跪射俑",
+    "count": "7 次",
+    "page": 100
+  },
+  {
+    "rank": 14,
+    "keyword": "牛",
+    "count": "6 次",
+    "page": 110
+  },
+  {
+    "rank": 15,
+    "keyword": "遊客",
+    "count": "6 次",
+    "page": 103
+  },
+  {
+    "rank": 16,
+    "keyword": "琉璃雲",
+    "count": "6 次",
+    "page": 97
+  },
+  {
+    "rank": 17,
+    "keyword": "水逗娘",
+    "count": "6 次",
+    "page": 96
+  },
+  {
+    "rank": 18,
+    "keyword": "動感",
+    "count": "6 次",
+    "page": 97
+  },
+  {
+    "rank": 19,
+    "keyword": "米開朗基羅",
+    "count": "5 次",
+    "page": 99
+  },
+  {
+    "rank": 20,
+    "keyword": "畢卡索",
+    "count": "5 次",
+    "page": 119
+  },
+  {
+    "rank": 21,
+    "keyword": "水牛群像",
+    "count": "5 次",
+    "page": 95
+  },
+  {
+    "rank": 22,
+    "keyword": "金字塔",
+    "count": "5 次",
+    "page": 100
+  },
+  {
+    "rank": 23,
+    "keyword": "量感",
+    "count": "5 次",
+    "page": 97
+  },
+  {
+    "rank": 24,
+    "keyword": "哈古的故事",
+    "count": "5 次",
+    "page": 103
+  },
+  {
+    "rank": 25,
+    "keyword": "皮毛餐具",
+    "count": "4 次",
+    "page": 106
+  },
+  {
+    "rank": 26,
+    "keyword": "王耀邦",
+    "count": "4 次",
+    "page": 24
+  },
+  {
+    "rank": 27,
+    "keyword": "台味誌",
+    "count": "4 次",
+    "page": 75
+  },
+  {
+    "rank": 28,
+    "keyword": "釋迦出山",
+    "count": "4 次",
+    "page": 99
+  },
+  {
+    "rank": 29,
+    "keyword": "自畫像",
+    "count": "4 次",
+    "page": 118
+  },
+  {
+    "rank": 30,
+    "keyword": "新手運",
+    "count": "4 次",
+    "page": 12
+  }
+];
+
+    const coldData = [
+  {
+    "seat": "01",
+    "name": "吳濬丞",
+    "options": [
+      {
+        "keyword": "黑鮪魚",
+        "page": 76
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "02",
+    "name": "李浚睿",
+    "options": [
+      {
+        "keyword": "DESSERT",
+        "page": 67
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "03",
+    "name": "林堉暐",
+    "options": [
+      {
+        "keyword": "王小明",
+        "page": 79
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "04",
+    "name": "姚宇恩",
+    "options": [
+      {
+        "keyword": "仿生獸",
+        "page": 108
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "05",
+    "name": "范昱謙",
+    "options": [
+      {
+        "keyword": "Re-lab",
+        "page": 79
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "06",
+    "name": "張奕瀚",
+    "options": [
+      {
+        "keyword": "達利",
+        "page": 112
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "07",
+    "name": "張睿桀",
+    "options": [
+      {
+        "keyword": "野地環境",
+        "page": 73
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "09",
+    "name": "湯宇晨",
+    "options": [
+      {
+        "keyword": "周佳",
+        "page": 93
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "10",
+    "name": "楊昀鈦",
+    "options": [
+      {
+        "keyword": "機械解構",
+        "page": 108
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "12",
+    "name": "葉昀杰",
+    "options": [
+      {
+        "keyword": "便便觀察",
+        "page": 71
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "13",
+    "name": "廖紹硯",
+    "options": [
+      {
+        "keyword": "湯匙與櫻桃",
+        "page": 102
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "14",
+    "name": "劉世期",
+    "options": [
+      {
+        "keyword": "秦始皇",
+        "page": 100
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "15",
+    "name": "鍾昊辰",
+    "options": [
+      {
+        "keyword": "胸像",
+        "page": 94
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "16",
+    "name": "呂吟萱",
+    "options": [
+      {
+        "keyword": "大掃除",
+        "page": 102
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "17",
+    "name": "沈晉儀",
+    "options": [
+      {
+        "keyword": "划行",
+        "page": 104
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "18",
+    "name": "周蓉兒",
+    "options": [
+      {
+        "keyword": "孟克",
+        "page": 116
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "19",
+    "name": "林珈甄",
+    "options": [
+      {
+        "keyword": "公共藝術",
+        "page": 96
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "20",
+    "name": "邱沛昀",
+    "options": [
+      {
+        "keyword": "石頭",
+        "page": 93
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "21",
+    "name": "范芷瑄",
+    "options": [
+      {
+        "keyword": "珍奶",
+        "page": 75
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "22",
+    "name": "張喬寧",
+    "options": [
+      {
+        "keyword": "國旗插在硫磺島上",
+        "page": 98
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "23",
+    "name": "莊妘喬",
+    "options": [
+      {
+        "keyword": "拆解",
+        "page": 107
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "24",
+    "name": "許文玲",
+    "options": [
+      {
+        "keyword": "情緒色盤",
+        "page": 80
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "25",
+    "name": "陳允恩",
+    "options": [
+      {
+        "keyword": "你今天喝水了嗎？",
+        "page": 71
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "26",
+    "name": "陳姵語",
+    "options": [
+      {
+        "keyword": "Interloop",
+        "page": 97
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "27",
+    "name": "陳洧蕾",
+    "options": [
+      {
+        "keyword": "排版",
+        "page": 31
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "28",
+    "name": "曾星瑜",
+    "options": [
+      {
+        "keyword": "氣候行動",
+        "page": 6
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "29",
+    "name": "楊黎亞",
+    "options": [
+      {
+        "keyword": "塑造",
+        "page": 95
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "30",
+    "name": "劉晏彤",
+    "options": [
+      {
+        "keyword": "席德進",
+        "page": 113
+      }
+    ],
+    "photo": true
+  },
+  {
+    "seat": "31",
+    "name": "蕭岑紜",
+    "options": [
+      {
+        "keyword": "韓森",
+        "page": 103
+      }
+    ],
+    "photo": true
+  }
+];
+
+    let hotPool = [...hotData];
+    let coldPool = [...coldData];
+    let currentTextbookPage = null;
+
+    // 格式化課本頁碼檔名 (例如 26 -> ../Textbook/p026.jpg)
+    function getTextbookUrl(page) {
+      const paddedPage = String(page).padStart(3, '0');
+      return `../Textbook/p${paddedPage}.jpg`;
+    }
+
+    // 格式化學生學習單檔名 (例如 "03" -> ./worksheet/906_03.jpg)
+    function getStudentUrl(seat) {
+      return `./worksheet/915__${seat}.jpg`;
+    }
+
+    // 抽熱門關鍵字
+    function drawHot() {
+      if (hotPool.length === 0) {
+        alert("熱門關鍵字已全部抽完！");
+        return;
+      }
+      const idx = Math.floor(Math.random() * hotPool.length);
+      const item = hotPool.splice(idx, 1)[0];
+
+      const box = document.getElementById('hot-box');
+      box.innerHTML = `
+        <div class="keyword-text hot-text">${item.keyword}</div>
+        <div class="badge badge-rank">第 ${item.rank} 名</div>
+        <div class="sub-info">出現總次數：${item.count}</div>
+        <div class="btn-group">
+          <button class="action-btn btn-textbook" onclick="openTextbookModal(${item.page})">
+            📖 查看課本 (P.${item.page})
+          </button>
+        </div>
+      `;
+
+      document.getElementById('hot-counter').innerText = `剩餘可抽：${hotPool.length} / ${hotData.length}`;
+    }
+
+    // 抽冷門關鍵字
+    function drawCold() {
+      if (coldPool.length === 0) {
+        alert("冷門關鍵字已全部抽完！");
+        return;
+      }
+      const idx = Math.floor(Math.random() * coldPool.length);
+      const student = coldPool.splice(idx, 1)[0];
+      const item = student.options[Math.floor(Math.random() * student.options.length)];
+
+      const box = document.getElementById('cold-box');
+      box.innerHTML = `
+        <div class="keyword-text cold-text">${item.keyword}</div>
+        <div class="sub-info">${student.name} (${student.seat}號) | 課本 P.${item.page}</div>
+        <div class="btn-group">
+          <button class="action-btn btn-student" onclick="openStudentModal('${student.seat}', '${student.name}')">
+            📄 學生原檔 (${student.seat}號)
+          </button>
+          <button class="action-btn btn-textbook" onclick="openTextbookModal(${item.page})">
+            📖 查看課本 (P.${item.page})
+          </button>
+        </div>
+      `;
+
+      document.getElementById('cold-counter').innerText = `剩餘可抽：${coldPool.length} / ${coldData.length}`;
+    }
+
+    // 彈窗邏輯
+    function openTextbookModal(page) {
+      currentTextbookPage = page;
+      document.getElementById('modal-title').innerText = `課本 P.${page} 頁碼展示`;
+      document.getElementById('modal-img').src = getTextbookUrl(page);
+      
+      // 顯示前後翻頁按鈕
+      document.getElementById('btn-prev-page').style.display = 'inline-block';
+      document.getElementById('btn-next-page').style.display = 'inline-block';
+      
+      document.getElementById('modal-overlay').classList.add('active');
+    }
+
+    function openStudentModal(seat, name) {
+      currentTextbookPage = null; // 非課本，關閉翻頁功能
+      document.getElementById('modal-title').innerText = `915班 ${seat}號 ${name} 學生學習單原檔`;
+      document.getElementById('modal-img').src = getStudentUrl(seat);
+      
+      // 隱藏課本翻頁按鈕
+      document.getElementById('btn-prev-page').style.display = 'none';
+      document.getElementById('btn-next-page').style.display = 'none';
+      
+      document.getElementById('modal-overlay').classList.add('active');
+    }
+
+    function changeTextbookPage(delta) {
+      if (currentTextbookPage === null) return;
+      currentTextbookPage += delta;
+      if (currentTextbookPage < 1) currentTextbookPage = 1;
+      
+      document.getElementById('modal-title').innerText = `課本 P.${currentTextbookPage} 頁碼展示`;
+      document.getElementById('modal-img').src = getTextbookUrl(currentTextbookPage);
+    }
+
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('active');
+    }
+
+    // 點擊背景空白處關閉 Modal
+    document.getElementById('modal-overlay').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeModal();
+      }
+    });
+  </script>
+</body>
+</html>
