@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>917班 課堂關鍵字探索與抽選系統</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    body { background: linear-gradient(135deg, #0d111e 0%, #161b2e 100%); color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 30px 20px; }
+    .header { text-align: center; margin-bottom: 30px; }
+    .header h1 { font-size: 2.2rem; font-weight: 800; background: linear-gradient(90deg, #ff416c, #ff4b2b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 1px; margin-bottom: 8px; }
+    .header p { color: #9aa0b4; font-size: 1rem; }
+    .main-container { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; width: 100%; max-width: 1100px; }
+    @media (max-width: 768px) { .main-container { grid-template-columns: 1fr; } .header h1 { font-size: 1.65rem; } body { padding: 22px 14px; } }
+    .card { background: rgba(22, 27, 46, .82); border: 1px solid rgba(255,255,255,.08); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,.3); backdrop-filter: blur(10px); }
+    .card-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .display-box { background: #111524; border: 1px dashed #2b334d; border-radius: 14px; min-height: 220px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; margin-bottom: 20px; position: relative; }
+    .placeholder-title { font-size: 1.8rem; font-weight: 800; color: #00b4d8; margin-bottom: 8px; }
+    .placeholder-sub { color: #6c757d; font-size: .95rem; }
+    .keyword-text { font-size: 2.2rem; font-weight: 900; margin-bottom: 10px; letter-spacing: 1px; word-break: break-word; }
+    .hot-text { color: #fff; } .cold-text { color: #38bdf8; }
+    .badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: .85rem; font-weight: 700; margin-bottom: 6px; }
+    .badge-rank { background: #f59e0b; color: #000; }
+    .sub-info { color: #94a3b8; font-size: .95rem; margin-bottom: 12px; }
+    .btn-group { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+    button { font: inherit; }
+    .action-btn { padding: 8px 16px; border-radius: 8px; border: none; font-size: .9rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: transform .2s, background .2s; }
+    .action-btn:active, .draw-btn:active { transform: scale(.96); }
+    .btn-textbook { background: #0284c7; color: #fff; } .btn-textbook:hover { background: #0369a1; }
+    .btn-student { background: #334155; color: #38bdf8; border: 1px solid #0284c7; } .btn-student:hover { background: #1e293b; }
+    .draw-btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-size: 1.2rem; font-weight: 800; color: #fff; cursor: pointer; transition: background .2s, transform .1s; box-shadow: 0 4px 12px rgba(0,0,0,.2); }
+    .draw-hot { background: #ff3b5c; } .draw-hot:hover { background: #e62e4d; }
+    .draw-cold { background: #00b4d8; } .draw-cold:hover { background: #0096c7; }
+    .counter { text-align: center; margin-top: 12px; font-size: .85rem; color: #64748b; background: rgba(0,0,0,.2); padding: 4px 12px; border-radius: 20px; align-self: center; }
+    .reset-btn { margin: 26px auto 0; background: transparent; color: #94a3b8; border: 1px solid #334155; padding: 8px 14px; border-radius: 8px; cursor: pointer; }
+    .reset-btn:hover { color: #fff; border-color: #64748b; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(10,13,22,.92); backdrop-filter: blur(8px); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: flex-start; padding: 15px; overflow-y: auto; }
+    .modal-overlay.active { display: flex; }
+    .modal-header { width: 100%; max-width: 900px; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0 15px; border-bottom: 1px solid rgba(255,255,255,.1); margin-bottom: 15px; }
+    .modal-title { font-size: 1.2rem; font-weight: 700; color: #fff; }
+    .modal-controls { display: flex; gap: 10px; align-items: center; }
+    .nav-btn, .close-btn { border-radius: 6px; padding: 6px 12px; font-weight: 600; cursor: pointer; }
+    .nav-btn { background: #1e293b; color: #38bdf8; border: 1px solid #334155; } .close-btn { background: #ef4444; color: #fff; border: none; }
+    .modal-body { width: 100%; max-width: 900px; display: flex; justify-content: center; }
+    .modal-img { width: 100%; height: auto; max-height: 85vh; object-fit: contain; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+    .image-error { color: #fca5a5; padding: 25px; line-height: 1.7; }
+    @media (max-width: 600px) { .modal-header { align-items: flex-start; flex-direction: column; } .modal-controls { width: 100%; flex-wrap: wrap; } .keyword-text { font-size: 1.9rem; } }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>917班 課堂關鍵字探索與抽選系統</h1>
+    <p>熱門關鍵字 30 筆｜冷門關鍵字 33 位學生｜課本頁碼可直接查看</p>
+  </div>
+  <div class="main-container">
+    <section class="card" aria-labelledby="hot-heading">
+      <div class="card-title" id="hot-heading">🔥 熱門關鍵字</div>
+      <div class="display-box" id="hot-box"><div class="placeholder-title">點擊下方按鈕開始</div><div class="placeholder-sub">熱門關鍵字不重複抽選</div></div>
+      <button class="draw-btn draw-hot" onclick="drawHot()">抽取熱門關鍵字</button>
+      <div class="counter" id="hot-counter">剩餘可抽：30 / 30</div>
+    </section>
+    <section class="card" aria-labelledby="cold-heading">
+      <div class="card-title" id="cold-heading">❄️ 冷門關鍵字</div>
+      <div class="display-box" id="cold-box"><div class="placeholder-title">點擊下方按鈕開始</div><div class="placeholder-sub">每位學生最多抽中一次</div></div>
+      <button class="draw-btn draw-cold" onclick="drawCold()">抽取冷門關鍵字</button>
+      <div class="counter" id="cold-counter">剩餘可抽：33 / 33</div>
+    </section>
+  </div>
+  <button class="reset-btn" onclick="resetDraws()">重新開始抽選</button>
+
+  <div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">圖片預覽</div>
+      <div class="modal-controls">
+        <button class="nav-btn" id="btn-prev-page" onclick="changeTextbookPage(-1)">⬅️ 上一頁</button>
+        <button class="nav-btn" id="btn-next-page" onclick="changeTextbookPage(1)">下一頁 ➡️</button>
+        <button class="close-btn" onclick="closeModal()">❌ 關閉</button>
+      </div>
+    </div>
+    <div class="modal-body"><img src="" id="modal-img" class="modal-img" alt="課本或學生學習單圖片預覽"></div>
+  </div>
+
+  <script>
+    const hotData = [{"rank":1,"keyword":"畢卡索","count":"17 次","page":119},{"rank":2,"keyword":"梵谷","count":"16 次","page":119},{"rank":3,"keyword":"自畫像","count":"12 次","page":118},{"rank":4,"keyword":"牛","count":"10 次","page":110},{"rank":5,"keyword":"水泥","count":"8 次","page":93},{"rank":6,"keyword":"噴泉","count":"8 次","page":108},{"rank":7,"keyword":"哈古","count":"8 次","page":103},{"rank":8,"keyword":"金字塔","count":"8 次","page":100},{"rank":9,"keyword":"黃土水","count":"7 次","page":94},{"rank":10,"keyword":"兔子","count":"7 次","page":106},{"rank":11,"keyword":"高更","count":"7 次","page":124},{"rank":12,"keyword":"米開朗基羅","count":"7 次","page":99},{"rank":13,"keyword":"藝術","count":"7 次","page":122},{"rank":14,"keyword":"石膏","count":"6 次","page":99},{"rank":15,"keyword":"石頭","count":"6 次","page":93},{"rank":16,"keyword":"少女","count":"5 次","page":94},{"rank":17,"keyword":"米老鼠","count":"5 次","page":101},{"rank":18,"keyword":"黑寡婦","count":"5 次","page":109},{"rank":19,"keyword":"基督像","count":"5 次","page":99},{"rank":20,"keyword":"長期停車","count":"5 次","page":107},{"rank":21,"keyword":"我與死神","count":"5 次","page":117},{"rank":22,"keyword":"冰山素描","count":"5 次","page":115},{"rank":23,"keyword":"自我的空間","count":"5 次","page":115},{"rank":24,"keyword":"孟克","count":"5 次","page":116},{"rank":25,"keyword":"跪射俑","count":"5 次","page":100},{"rank":26,"keyword":"遊客","count":"5 次","page":103},{"rank":27,"keyword":"冰塊","count":"5 次","page":93},{"rank":28,"keyword":"雕","count":"4 次","page":93},{"rank":29,"keyword":"湯匙與櫻桃","count":"4 次","page":102},{"rank":30,"keyword":"人生的更迭","count":"4 次","page":112}];
+    const coldData = [{"seat":"01","name":"方侑丞","keyword":"阿公","page":30},{"seat":"02","name":"王捷禹","keyword":"青壯男人","page":116},{"seat":"03","name":"呂紹揚","keyword":"南宋","page":117},{"seat":"04","name":"宋翊杰","keyword":"林布蘭","page":118},{"seat":"05","name":"李岳恩","keyword":"大掃除","page":102},{"seat":"06","name":"李苡本","keyword":"史匹柏","page":32},{"seat":"07","name":"李禧福","keyword":"骷髏","page":117},{"seat":"08","name":"林宥劼","keyword":"玻璃纖維","page":103},{"seat":"09","name":"胡樂","keyword":"乾隆","page":122},{"seat":"10","name":"梁朝清","keyword":"麻麻","page":72},{"seat":"11","name":"莊哲森","keyword":"石膏","page":93},{"seat":"12","name":"陳孟詮","keyword":"小公主","page":122},{"seat":"13","name":"陳為嘉","keyword":"自古","page":100},{"seat":"14","name":"曾朝武","keyword":"明天過後","page":112},{"seat":"15","name":"劉任鴻","keyword":"量感","page":91},{"seat":"16","name":"潘鈺翔","keyword":"抽象","page":104},{"seat":"17","name":"鍾明宇","keyword":"私人","page":86},{"seat":"18","name":"王妤萱","keyword":"代表色","page":81},{"seat":"19","name":"王思涵","keyword":"王志文","page":101},{"seat":"20","name":"吳奕萱","keyword":"石像","page":100},{"seat":"21","name":"林妍瑄","keyword":"陶土","page":93},{"seat":"22","name":"林沛萱","keyword":"直式","page":67},{"seat":"23","name":"林語彤","keyword":"雙重自畫像","page":117},{"seat":"24","name":"徐芷柔","keyword":"視覺","page":94},{"seat":"25","name":"馬梓倩","keyword":"展望","page":81},{"seat":"26","name":"曾韋茹","keyword":"時間","page":31},{"seat":"27","name":"黃品雲","keyword":"辣椒","page":79},{"seat":"28","name":"李思雲","keyword":"史高維爾辣度表","page":70},{"seat":"29","name":"黃舒翎","keyword":"臺灣","page":39},{"seat":"30","name":"鄧榆蓁","keyword":"英國","page":120},{"seat":"31","name":"鄭紫綺","keyword":"連結","page":105},{"seat":"32","name":"謝宜彤","keyword":"冰山","page":115},{"seat":"33","name":"羅玉燁","keyword":"色彩","page":70}];
+    let hotPool = [...hotData], coldPool = [...coldData], currentTextbookPage = null;
+
+    function getTextbookUrl(page) { return '../Textbook/p' + String(page).padStart(3, '0') + '.jpg'; }
+    function getStudentUrl(seat) { return './worksheet/917__' + seat + '.jpg'; }
+    function setImage(src, alt) {
+      const img = document.getElementById('modal-img');
+      img.alt = alt;
+      img.onerror = () => { img.onerror = null; img.src = ''; img.insertAdjacentHTML('afterend', '<div class="image-error">圖片目前無法載入。請確認 GitHub 上的檔名、大小寫與資料夾位置。</div>'); };
+      img.src = src;
+    }
+    function drawHot() {
+      if (!hotPool.length) return alert('熱門關鍵字已全部抽完！');
+      const item = hotPool.splice(Math.floor(Math.random() * hotPool.length), 1)[0];
+      document.getElementById('hot-box').innerHTML = '<div class="keyword-text hot-text">' + item.keyword + '</div><div class="badge badge-rank">第 ' + item.rank + ' 名</div><div class="sub-info">出現總次數：' + item.count + '</div><div class="btn-group"><button class="action-btn btn-textbook" onclick="openTextbookModal(' + item.page + ')">📖 查看課本 (P.' + item.page + ')</button></div>';
+      document.getElementById('hot-counter').innerText = '剩餘可抽：' + hotPool.length + ' / ' + hotData.length;
+    }
+    function drawCold() {
+      if (!coldPool.length) return alert('冷門關鍵字已全部抽完！');
+      const item = coldPool.splice(Math.floor(Math.random() * coldPool.length), 1)[0];
+      document.getElementById('cold-box').innerHTML = '<div class="keyword-text cold-text">' + item.keyword + '</div><div class="sub-info">' + item.seat + '號 ' + item.name + '｜課本 P.' + item.page + '</div><div class="btn-group"><button class="action-btn btn-student" onclick="openStudentModal(&quot;' + item.seat + '&quot;, &quot;' + item.name + '&quot;)">📄 查看學習單 (' + item.seat + '號)</button><button class="action-btn btn-textbook" onclick="openTextbookModal(' + item.page + ')">📖 查看課本 (P.' + item.page + ')</button></div>';
+      document.getElementById('cold-counter').innerText = '剩餘可抽：' + coldPool.length + ' / ' + coldData.length;
+    }
+    function openTextbookModal(page) { currentTextbookPage = page; document.getElementById('modal-title').innerText = '課本 P.' + page + ' 頁面展示'; document.getElementById('btn-prev-page').style.display = 'inline-block'; document.getElementById('btn-next-page').style.display = 'inline-block'; setImage(getTextbookUrl(page), '課本第 ' + page + ' 頁'); document.getElementById('modal-overlay').classList.add('active'); }
+    function openStudentModal(seat, name) { currentTextbookPage = null; document.getElementById('modal-title').innerText = '917班 ' + seat + '號 ' + name + ' 學生學習單'; document.getElementById('btn-prev-page').style.display = 'none'; document.getElementById('btn-next-page').style.display = 'none'; setImage(getStudentUrl(seat), '917班 ' + seat + '號 ' + name + ' 學習單'); document.getElementById('modal-overlay').classList.add('active'); }
+    function changeTextbookPage(delta) { if (currentTextbookPage === null) return; currentTextbookPage = Math.max(1, currentTextbookPage + delta); document.getElementById('modal-title').innerText = '課本 P.' + currentTextbookPage + ' 頁面展示'; setImage(getTextbookUrl(currentTextbookPage), '課本第 ' + currentTextbookPage + ' 頁'); }
+    function closeModal() { document.getElementById('modal-overlay').classList.remove('active'); document.getElementById('modal-img').src = ''; document.querySelectorAll('.image-error').forEach(el => el.remove()); }
+    function resetDraws() { hotPool = [...hotData]; coldPool = [...coldData]; document.getElementById('hot-counter').innerText = '剩餘可抽：' + hotData.length + ' / ' + hotData.length; document.getElementById('cold-counter').innerText = '剩餘可抽：' + coldData.length + ' / ' + coldData.length; document.getElementById('hot-box').innerHTML = '<div class="placeholder-title">點擊下方按鈕開始</div><div class="placeholder-sub">熱門關鍵字不重複抽選</div>'; document.getElementById('cold-box').innerHTML = '<div class="placeholder-title">點擊下方按鈕開始</div><div class="placeholder-sub">每位學生最多抽中一次</div>'; }
+    document.getElementById('modal-overlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+  </script>
+</body>
+</html>
